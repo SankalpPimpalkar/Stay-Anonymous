@@ -1,17 +1,20 @@
 {
   "expo": {
-    "name": "anyonymousfeelings",
-    "slug": "anyonymousfeelings",
+    "name": "Stay Anonymous",
+    "slug": "stay-anonymous",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "anyonymousfeelings",
+    "scheme": "stay-anonymous",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "backgroundColor": "#0F1419",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sankalp.anyanonymousfeelings"
     },
     "android": {
+      "package": "com.sankalp.anyanonymousfeelings",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -23,7 +26,8 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -43,6 +47,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8295a24b-4353-48c9-949c-9dd189464b00"
+      }
     }
   }
 }
