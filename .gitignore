@@ -34,6 +34,7 @@ yarn-error.*
 .env
 .env*.local
 google-services.json
+anonymousfeelings-120ed-firebase-adminsdk-fbsvc-444454b669.json
 
 # typescript
 *.tsbuildinfo
