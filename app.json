@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Stay Anonymous",
-    "slug": "stay-anonymous",
+    "slug": "anyonymousfeelings",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,10 +11,14 @@
     "backgroundColor": "#0F1419",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sankalp.anyanonymousfeelings"
+      "bundleIdentifier": "com.sankalp.anyanonymousfeelings",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.sankalp.anyanonymousfeelings",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -31,6 +35,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#E87461"
+        }
+      ],
       [
         "expo-splash-screen",
         {

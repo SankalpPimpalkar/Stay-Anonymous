@@ -1,16 +1,29 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS } from '@/src/constants/styles'
 import { useAuth } from '@/src/context/AuthContextProvider'
 import { Redirect } from 'expo-router'
+import React, { useState } from 'react'
+import { Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function LoginScreen() {
-
-    const { signInAnonymously, isAuthenticated } = useAuth()
+    const { signInAnonymously, isAuthenticated } = useAuth();
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     if (isAuthenticated) {
         return <Redirect href={'/(tabs)/home'} />
+    }
+
+    const handleLogin = async () => {
+        setIsLoggingIn(true);
+        console.log("LoginScreen: Join Anonymously pressed");
+        try {
+            await signInAnonymously();
+        } catch (error: any) {
+            console.error("LoginScreen: Login failed:", error?.message || error);
+            alert("Login failed: " + (error?.message || "Please check your internet connection."));
+        } finally {
+            setIsLoggingIn(false);
+        }
     }
 
     return (
@@ -35,12 +48,13 @@ export default function LoginScreen() {
                     <View className="gap-3">
                         <TouchableOpacity
                             activeOpacity={0.85}
-                            style={{ backgroundColor: COLORS.ACCENT }}
+                            disabled={isLoggingIn}
+                            style={{ backgroundColor: isLoggingIn ? COLORS.TEXT_MUTED : COLORS.ACCENT }}
                             className="bg-white py-4 rounded-xl"
-                            onPress={signInAnonymously}
+                            onPress={handleLogin}
                         >
                             <Text style={{ color: COLORS.TEXT_PRIMARY }} className="text-center text-lg font-extrabold text-black">
-                                Join Anonymously
+                                {isLoggingIn ? "Signing in..." : "Join Anonymously"}
                             </Text>
                         </TouchableOpacity>
 

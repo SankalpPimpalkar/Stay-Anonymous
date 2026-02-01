@@ -1,14 +1,16 @@
+import { router } from "expo-router";
+import { User, signInAnonymously as firebaseSignInAnonymously, onAuthStateChanged } from "firebase/auth";
 import {
+    ReactNode,
     createContext,
+    useCallback,
     useContext,
     useEffect,
     useState,
-    ReactNode,
-    useCallback,
 } from "react";
-import { User, onAuthStateChanged, signInAnonymously as firebaseSignInAnonymously } from "firebase/auth";
 import { auth } from "../services/firebase.service";
-import { router } from "expo-router";
+import { registerForPushNotificationsAsync } from "../services/notification.service";
+import { updateUserPushToken } from "../services/user.service";
 
 interface AuthContextType {
     user: User | null;
@@ -30,9 +32,21 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-            setUser(firebaseUser);
-            setLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            try {
+                setUser(firebaseUser || null);
+                setLoading(false);
+
+                if (firebaseUser) {
+                    const token = await registerForPushNotificationsAsync();
+                    if (token) {
+                        await updateUserPushToken(firebaseUser.uid, token);
+                    }
+                }
+            } catch (error) {
+                console.error("AuthContextProvider: Error in auth state change listener:", error);
+                setLoading(false);
+            }
         });
 
         return () => unsubscribe();

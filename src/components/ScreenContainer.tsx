@@ -14,9 +14,12 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
     style,
     ...props
 }) => {
+    const backgroundColor = (style as any)?.backgroundColor || COLORS.BACKGROUND;
+
     return (
         <SafeAreaView
-            style={{ flex: 1, backgroundColor: COLORS.BACKGROUND }}
+            style={{ flex: 1, backgroundColor }}
+            edges={['top', 'left', 'right']}
             className="flex-1"
         >
             <View

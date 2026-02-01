@@ -1,4 +1,6 @@
 import { db } from "@/src/services/firebase.service";
+import { sendPushNotification } from "@/src/services/notification.service";
+import { getUserPushToken } from "@/src/services/user.service";
 import {
     addDoc,
     collection,
@@ -87,6 +89,7 @@ export const handlePostReaction = async (post: any, userId: string, type: 'relat
 
         if (reactionDoc.exists()) {
             const oldType = reactionDoc.data().type;
+
             if (oldType === type) {
                 // Toggle off
                 transaction.delete(reactionRef);
@@ -100,11 +103,16 @@ export const handlePostReaction = async (post: any, userId: string, type: 'relat
                     postId: post.id,
                     userId,
                     createdAt: serverTimestamp()
-                });
+                }, { merge: true });
                 transaction.update(postRef, {
                     [`reactions.${oldType}`]: increment(-1),
                     [`reactions.${type}`]: increment(1)
                 });
+
+                // Send notification on switch too
+                if (post.userId !== userId) {
+                    triggerNotification(post.userId, userId, post.id, type, true);
+                }
             }
         } else {
             // New reaction
@@ -118,21 +126,36 @@ export const handlePostReaction = async (post: any, userId: string, type: 'relat
                 [`reactions.${type}`]: increment(1)
             });
 
-            // Send notification
+            // Send notification on new reaction
             if (post.userId !== userId) {
-                const notifRef = doc(collection(db, "notifications"));
-                transaction.set(notifRef, {
-                    userId: post.userId,
-                    senderId: userId,
-                    postId: post.id,
-                    type: 'reaction',
-                    message: type === 'relatable'
-                        ? "Someone found your post relatable"
-                        : "Someone sent support for your post",
-                    createdAt: serverTimestamp(),
-                    read: false
-                });
+                triggerNotification(post.userId, userId, post.id, type, false);
             }
         }
     });
+};
+
+const triggerNotification = async (recipientId: string, senderId: string, postId: string, type: string, isSwitch: boolean) => {
+    try {
+        const message = type === 'relatable'
+            ? "Someone found your post relatable"
+            : "Someone sent support for your post";
+
+        await addDoc(collection(db, "notifications"), {
+            userId: recipientId,
+            senderId: senderId,
+            postId: postId,
+            type: 'reaction',
+            message: message + (isSwitch ? " (updated reaction)" : ""),
+            createdAt: serverTimestamp(),
+            read: false
+        });
+
+        const token = await getUserPushToken(recipientId);
+
+        if (token) {
+            await sendPushNotification(token, "New Reaction!", message, { postId });
+        }
+    } catch (e) {
+        console.error("PostService: Failed to trigger notification:", e);
+    }
 };

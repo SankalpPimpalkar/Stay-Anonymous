@@ -1,12 +1,12 @@
-import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebase.service";
 
 export async function signInAnonymous() {
     try {
         const result = await signInAnonymously(auth);
         return result.user;
-    } catch (error) {
-        console.error("Anonymous sign-in failed:", error);
+    } catch (error: any) {
+        console.error("AuthService: Anonymous sign-in failed:", error?.message || error);
         throw error;
     }
 }

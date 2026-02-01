@@ -16,6 +16,8 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
 
+    console.log("Home: Rendering. posts count:", posts.length, "loading:", loading);
+
     // Unread count listener
     useEffect(() => {
         if (!auth.currentUser) return;
@@ -30,8 +32,8 @@ export default function Home() {
     }, []);
 
     return (
-        <ScreenContainer style={{ backgroundColor: COLORS.PRIMARY }}>
-            <View className="flex-1 pt-4">
+        <ScreenContainer style={{ backgroundColor: COLORS.PRIMARY, flex: 1 }}>
+            <View style={{ flex: 1 }} className="flex-1 pt-4">
                 <Header title='Your Feed'>
                     <View className='flex flex-row gap-5 items-center'>
                         <Link href={'/create'}>
